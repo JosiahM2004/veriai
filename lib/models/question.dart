@@ -1,8 +1,10 @@
-enum ContentType { formal, informal, video }
+enum ContentType { formal, informal}
 
+//the blueprint for each question featured in the app
+//all fields are final as the curated dataset will not change when using the app 
 class Question {
   final String id;
-  final String contextInfo;
+  final String questionContext;
   final String content;
   final bool isAI;
   final String explanation;
@@ -10,7 +12,7 @@ class Question {
 
   const Question({
     required this.id,
-    required this.contextInfo,
+    required this.questionContext,
     required this.content,
     required this.isAI,
     required this.explanation,
@@ -18,11 +20,14 @@ class Question {
   });
 }
 
+//stores everything which can happen during the answering of a question 
+//is created at runtime as the user progresses - it's not const because it will change 
 class QuestionResult {
   final Question question;
-  final bool userAnswer;
+  final bool userAnswer; //true = user believes the content is AI generated, false = user believes the content is human generated 
   final String userExplanation;
 
+//compares the user's selection to the actual answer
   bool get wasCorrect => userAnswer == question.isAI;
 
   QuestionResult({
