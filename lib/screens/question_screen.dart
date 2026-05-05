@@ -3,7 +3,7 @@ import '../models/question.dart';
 import 'feedback_screen.dart';
 import 'result_screen.dart';
 
-//StatefulWdiget means this screen has data that changes while it's running, because progress, score and text input are all tracked
+//StatefulWidget means this screen has data that changes while it's running, because progress, score and text input are all tracked
 //state class holds the data that changes internally while the screen is running
 class QuestionScreen extends StatefulWidget { 
   final List<Question> questions;
@@ -19,36 +19,34 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
   final List<QuestionResult> _results = [];
 
-  
   final TextEditingController _explanationController = TextEditingController();
 
-//when the quiz screen is removed from the app, Flutter will call dispose() automatically
-//TextEditingController must be disposed of manually to help free up memory 
+  //when the quiz screen is removed from the app, Flutter will call dispose() automatically
+  //TextEditingController must be disposed of manually to help free up memory 
   @override
   void dispose() {
     _explanationController.dispose();
     super.dispose();
   }
 
-  
   Question get _currentQuestion => widget.questions[_currentIndex];
 
- //called when the users taps the yes/ no button
+  //called when the user taps the yes/no button
   void _submitAnswer(bool userSaidAI) {
     final explanation = _explanationController.text.trim();
 
-//creates a new QuestionResult and adds it to our results list - permanently records what happened on the questions 
+    //creates a new QuestionResult and adds it to our results list - permanently records what happened on the question
     _results.add(QuestionResult(
       question: _currentQuestion,
       userAnswer: userSaidAI,
       userExplanation: explanation,
     ));
 
-//navigates to the feedback screen while passing 4 things:
-//eresult - the result just created 
-//questionNumber - the current question number shown in the header 
-//totalQuestions - total number of questions 
-//onNext - is a callback, a function passed in so that the feedback screen can call back when the use presses the Next button 
+    //navigates to the feedback screen while passing 4 things:
+    //result - the result just created 
+    //questionNumber - the current question number shown in the header 
+    //totalQuestions - total number of questions 
+    //onNext - is a callback, a function passed in so that the feedback screen can call back when the user presses the Next button 
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -62,14 +60,13 @@ class _QuestionScreenState extends State<QuestionScreen> {
     );
   }
 
-//the callback passed to the feedback screen - when the user taps next Navigator.pop() removes the feedback screen from the stack
+  //the callback passed to the feedback screen - when the user taps next Navigator.pop() removes the feedback screen from the stack
   void _onFeedbackComplete() {
     Navigator.pop(context);
 
     final nextIndex = _currentIndex + 1;
 
     if (nextIndex >= widget.questions.length) {
-      
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -77,7 +74,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
         ),
       );
     } else {
-        //setState() updates _currentIndex to the next question and clears the text field - without it the screen wouldn't update visually
+      //setState() updates _currentIndex to the next question and clears the text field - without it the screen wouldn't update visually
       setState(() {
         _currentIndex = nextIndex;
         _explanationController.clear();
@@ -85,7 +82,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
     }
   }
 
-//
   @override
   Widget build(BuildContext context) {
     final question = _currentQuestion;
@@ -93,53 +89,67 @@ class _QuestionScreenState extends State<QuestionScreen> {
     final totalQuestions = widget.questions.length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F2),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+      body: Stack(
+        children: [
 
-           
-            Container(
-              color: const Color(0xFF2C2C2C),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Question $questionNumber of $totalQuestions',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    question.questionContext,
-                    style: TextStyle(
-                      color: Colors.grey.shade400,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
+          //background image changes with each question
+          //uses the current index to pick q1.jpg through q10.jpg
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/q${_currentIndex + 1}.jpg',
+              fit: BoxFit.cover,
             ),
+          ),
 
-             //makes the section fill all remaining screen space below the header, and make its scrollable
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
+          //semi-transparent dark overlay — makes content readable against any image
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.1),
+            ),
+          ),
 
-                    
-                    Container(
+          //SafeArea keeps content away from camera notches and system bars
+          SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+
+                //dark header bar showing question number and context
+                Container(
+                  color: const Color(0xFF2C2C2C),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Question $questionNumber of $totalQuestions',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        question.questionContext,
+                        style: TextStyle(
+                          color: Colors.grey.shade400,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                //content box fills the top section and is scrollable for long passages
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Colors.white.withOpacity(0.65),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: Colors.grey.shade300),
                       ),
@@ -152,78 +162,87 @@ class _QuestionScreenState extends State<QuestionScreen> {
                         ),
                       ),
                     ),
-
-                    const SizedBox(height: 20),
-
-                    
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _AnswerButton(
-                            label: 'Yes',
-                            color: const Color(0xFF4CAF50),
-                            onTap: () => _submitAnswer(true),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _AnswerButton(
-                            label: 'No',
-                            color: const Color(0xFFF44336),
-                            onTap: () => _submitAnswer(false),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-
-                   
-                    TextField(
-                      controller: _explanationController,
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        hintText: 'Explain your answer here (optional)',
-                        hintStyle: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey.shade500,
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                   
-                    Text(
-                      '$questionNumber of $totalQuestions',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+
+                //yes/no buttons and explanation field pinned to the bottom
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+
+                      //yes / no buttons side by side
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _AnswerButton(
+                              label: 'Yes',
+                              color: const Color(0xFF4CAF50),
+                              onTap: () => _submitAnswer(true),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _AnswerButton(
+                              label: 'No',
+                              color: const Color(0xFFF44336),
+                              onTap: () => _submitAnswer(false),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      //optional explanation text field
+                      TextField(
+                        controller: _explanationController,
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          hintText: 'Explain your answer here (optional)',
+                          hintStyle: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey.shade500,
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      //progress indicator
+                      Text(
+                        '$questionNumber of $totalQuestions',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.grey.shade300,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
-
+//private answer button widget — used for both Yes and No
+//takes a label, colour and onTap callback
 class _AnswerButton extends StatelessWidget {
   final String label;
   final Color color;
