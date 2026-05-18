@@ -23,8 +23,8 @@ String _buildExportText() {
       ? 'formal'
       : 'informal';
 
-  //performance message — threshold is 5 out of 10
-  //below 5 gets encouragement, 5 and above gets congratulations
+  //performance message — threshold is 5/10
+  //>5 prints an encouregment message, 5< prints a congratulation message 
   final String performanceMessage = score < 5
       ? 'Better luck next time'
       : 'Well done';

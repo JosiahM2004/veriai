@@ -159,8 +159,7 @@ class _CategoryButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
-          //text sits at the bottom of the button — matches wireframe
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               label,
