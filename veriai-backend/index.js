@@ -4,6 +4,7 @@ require('dotenv').config();
 const express = require('express');
 const validateEnv = require('./config/env');
 const authRoutes = require('./routes/auth');
+const quizRoutes = require('./routes/quiz');
 
 //validate all environment variables are present before starting
 validateEnv();
@@ -16,6 +17,7 @@ app.use(express.json());
 
 //register the auth routes under the /auth prefix, so /auth/register and /auth/login become available
 app.use('/auth', authRoutes);
+app.use('/quiz', quizRoutes);
 
 //a simple test route to confirm the server is running
 app.get('/health', (req, res) => {

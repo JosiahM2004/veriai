@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/question.dart';
 import 'feedback_screen.dart';
 import 'result_screen.dart';
+import '../services/quiz_service.dart';
 
 //StatefulWidget means this screen has data that changes while it's running, because progress, score and text input are all tracked
 //state class holds the data that changes internally while the screen is running
@@ -20,6 +21,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
   final List<QuestionResult> _results = [];
 
   final TextEditingController _explanationController = TextEditingController();
+  final QuizService _quizService = QuizService();
 
   //when the quiz screen is removed from the app, Flutter will call dispose() automatically
   //TextEditingController must be disposed of manually to help free up memory 
@@ -32,13 +34,18 @@ class _QuestionScreenState extends State<QuestionScreen> {
   Question get _currentQuestion => widget.questions[_currentIndex];
 
   //called when the user taps the yes/no button
-  void _submitAnswer(bool userSaidAI) {
+  Future<void> _submitAnswer(bool userAiAnswer) async {
     final explanation = _explanationController.text.trim();
 
     //creates a new QuestionResult and adds it to our results list - permanently records what happened on the question
+    await _quizService.submitAttempt(
+      contentId: _currentQuestion.id,
+      userAnswer: userAiAnswer,
+      userExplanation: explanation.isEmpty ? null: explanation,
+    );
     _results.add(QuestionResult(
       question: _currentQuestion,
-      userAnswer: userSaidAI,
+      userAnswer: userAiAnswer,
       userExplanation: explanation,
     ));
 

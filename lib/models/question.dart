@@ -18,7 +18,21 @@ class Question {
     required this.explanation,
     required this.type,
   });
+
+
+ //converts a JSON object from the API into a question instance
+ factory Question.fromJson(Map<String, dynamic> json) {
+  return Question(
+    id: json['id'],
+    questionContext: 'Read the following and decide if it is AI or human generated.',
+    content: json['content_text'],
+    isAI: json['ai_generated'],
+    explanation: json['explanation'],
+    type: json['content_type'] == 'formal' ? ContentType.formal : ContentType.informal,
+  );
+ }
 }
+
 
 //stores everything which can happen during the answering of a question 
 //is created at runtime as the user progresses - it's not const because it will change 

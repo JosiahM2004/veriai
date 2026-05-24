@@ -1,24 +1,57 @@
 import 'package:flutter/material.dart';
-import '../data/questions_data.dart';
 import '../models/question.dart';
 import 'question_screen.dart';
+import 'login_screen.dart';
+import '../services/authentication_service.dart';
+import '../services/quiz_service.dart';
 
-//statelesswidget - screen has no data which changes over time, home screen remains idle and waits for user input
-//super.key passes an identifier to Flutter's internal widget tracking system
-class HomeScreen extends StatelessWidget {
+//statefulwidget because the screen now fetches data from the backend
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
-  //method is called when the user gives an input
-  //navigator.push() adds a new screen on top of the current visible screen acting like a card stack
-  //MaterialPageRoute defines which screen to show to the user
-  //questions are passed directly into QuestionScreen so the same quiz screen works for both categories
-  void _startQuiz(BuildContext context, List<Question> questions) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => QuestionScreen(questions: questions),
-      ),
-    );
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final AuthenticationService _authenticationService = AuthenticationService();
+  final QuizService _quizService = QuizService();
+
+  //fetches questions for the selected category from the backend
+  //then navigates to the question screen
+  Future<void> _startQuiz(BuildContext context, String categoryType) async {
+    final questions = await _quizService.fetchQuestions(categoryType);
+
+    if (questions.isEmpty) {
+      //show an error if no questions came back
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not load questions. Please try again.')),
+        );
+      }
+      return;
+    }
+
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => QuestionScreen(questions: questions),
+        ),
+      );
+    }
+  }
+
+  //logs the user out and returns them to the login screen
+  Future<void> _logout(BuildContext context) async {
+    await _authenticationService.logout();
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        (route) => false,
+      );
+    }
   }
 
   @override
@@ -28,13 +61,11 @@ class HomeScreen extends StatelessWidget {
         children: [
 
           //background nature image — covers the entire screen
-          //Positioned.fill stretches the image to fill all available space
           Positioned.fill(
             child: Image.asset(
-                'assets/images/background.jpg',
-                fit: BoxFit.cover,
+              'assets/images/background.jpg',
+              fit: BoxFit.cover,
             ),
-             
           ),
 
           //semi-transparent dark overlay — makes white text readable against any photo
@@ -44,7 +75,7 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
 
-          //SafeArea keeps content away from camera notches and system bars at the top and bottom of the screen
+          //SafeArea keeps content away from camera notches and system bars
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
@@ -52,9 +83,19 @@ class HomeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
 
+                  //logout button in the top right corner
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: IconButton(
+                      icon: const Icon(Icons.logout, color: Colors.white),
+                      onPressed: () => _logout(context),
+                      tooltip: 'Logout',
+                    ),
+                  ),
+
                   const SizedBox(height: 16),
 
-                  //VeriAI title — white text so it reads against the background image
+                  //VeriAI title
                   const Text(
                     'VeriAI',
                     textAlign: TextAlign.center,
@@ -68,7 +109,7 @@ class HomeScreen extends StatelessWidget {
 
                   const SizedBox(height: 8),
 
-                  //subtitle — matches wireframe
+                  //subtitle
                   const Text(
                     'Truth matters in the age of AI',
                     textAlign: TextAlign.center,
@@ -81,7 +122,7 @@ class HomeScreen extends StatelessWidget {
 
                   const Spacer(),
 
-                  //instruction box — semi-transparent white so background shows through slightly
+                  //instruction box
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -100,8 +141,7 @@ class HomeScreen extends StatelessWidget {
 
                   const Spacer(),
 
-                  //two tall buttons side by side — matches wireframe layout
-                  //Row places them horizontally, Expanded makes them equal width
+                  //two tall buttons side by side
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -110,7 +150,7 @@ class HomeScreen extends StatelessWidget {
                       Expanded(
                         child: _CategoryButton(
                           label: 'Informal content - containing things like internet videos, text messages and more',
-                          onTap: () => _startQuiz(context, informalQuestions),
+                          onTap: () => _startQuiz(context, 'informal'),
                         ),
                       ),
 
@@ -120,7 +160,7 @@ class HomeScreen extends StatelessWidget {
                       Expanded(
                         child: _CategoryButton(
                           label: 'Formal content - containing things like emails, news segments and educational/ informative books',
-                          onTap: () => _startQuiz(context, formalQuestions),
+                          onTap: () => _startQuiz(context, 'formal'),
                         ),
                       ),
                     ],
@@ -137,8 +177,7 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-//private widget which can only be used within this file, extends StatelessWidget meaning it inherits all the behaviour but has no changing data
-//takes a label and onTap
+//private widget which can only be used within this file
 //uses GestureDetector instead of ElevatedButton so we can fully control shape and text position
 class _CategoryButton extends StatelessWidget {
   final String label;
