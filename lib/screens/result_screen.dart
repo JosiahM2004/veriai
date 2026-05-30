@@ -41,8 +41,7 @@ class _ResultScreenState extends State<ResultScreen> {
   //counts how many results were correct
   int get _score => widget.results.where((r) => r.wasCorrect).length;
 
-  // builds the text shared via the native share sheet
-  //includes a performance message based on score threshold
+  
   String _buildExportText() {
     final int total = widget.results.length;
     final int score = _score;
@@ -54,11 +53,12 @@ class _ResultScreenState extends State<ResultScreen> {
         : 'informal';
 
     //performance message — threshold is 5/10
-    //>5 prints an encouragement message, 5< prints a congratulation message
+    //scores below 5 prints an encouragements message, 5 and above prints a congratulations message 
     final String performanceMessage = score < 5
         ? 'Better luck next time'
         : 'Well done';
-
+    
+    //StringBuffer used instead of string concatenation because it builds text efficiently in one pass
     final buffer = StringBuffer();
 
     //opening line — personalised to category and score

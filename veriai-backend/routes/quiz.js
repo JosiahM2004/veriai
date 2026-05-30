@@ -4,6 +4,8 @@ const authenticate = require('../middleware/authenticate');
 
 const router = express.Router();
 
+const isValidCategory = (type) => ['formal', 'informal'].includes(type);
+
 //fetch all questions for the selected category type
 //category type is passed as a URL parameter. for example: /quiz/content/formal
 router.get('/content/:categoryType', authenticate, async (req, res) => {
@@ -34,8 +36,8 @@ router.get('/content/:categoryType', authenticate, async (req, res) => {
   }
 });
 
-// save a users answers to the database
-// requires content_id and user_answer in the request body
+//save a users answers to the database
+//requires content_id and user_answer in the request body
 router.post('/attempt', authenticate, async (req, res) => {
   const { content_id, user_answer, user_explanation } = req.body;
   const userId = req.user.userId;
@@ -67,7 +69,8 @@ router.post('/attempt', authenticate, async (req, res) => {
       [userId, content_id, user_answer, user_explanation || null, isCorrect]
     );
 
-    // update category_progress - insert if first attempt, update totals if not
+    //upsert pattern - if this is the user's first attempt, a new row is inserted,
+    //if the users has attempted beforehand the existing row is updated
     await pool.query(
       `INSERT INTO category_progress (user_id, category_id, total_attempts, correct_answers)
        VALUES ($1, $2, 1, $3)
@@ -86,7 +89,7 @@ router.post('/attempt', authenticate, async (req, res) => {
   }
 });
 
-// get the logged in users progress per category
+//get the logged in users progress per category
 router.get('/progress', authenticate, async (req, res) => {
   const userId = req.user.userId;
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/authentication_service.dart';
 import 'home_screen.dart';
+import 'questionnaire_screen.dart';
 
 //statefulwidget because the text fields, loading state and error message all change
 class RegisterScreen extends StatefulWidget {
@@ -54,7 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (mounted) {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const QuestionnaireScreen()),
           (route) => false,
         );
       }

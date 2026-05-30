@@ -5,10 +5,19 @@ const pool = require('../config/db');
 
 const router = express.Router();
 
-// how many times bcrypt runs its hashing algorithm
+//how many times bcrypt runs its hashing algorithm
 const SALT_ROUNDS = 8;
 
-//REGISTER PROCESS---
+//creates a signed JWT containing the user's id and role
+const signToken = (userId, role) => {
+  return jwt.sign(
+    { userId, role },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN }
+  );
+};
+
+//REGISTER PROCESS
 
 //data sent from the app when the user fills in the register form, checks the data is present and meets basic requirments before doing anything with the database
 router.post('/register', async (req, res) => {
@@ -46,17 +55,11 @@ router.post('/register', async (req, res) => {
        VALUES ($1, $2, $3)
        RETURNING id, email, username, created_at`,
       [email.toLowerCase(), username, passwordHash]
-    );
+    )
 
     const user = result.rows[0];
-
-    //sign a JWT so the user is immediately logged in after registering
-    const token = jwt.sign(
-      { userId: user.id, role: 'user' },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
-    );
-
+    const token = signToken(user.id, 'user');
+    
     return res.status(201).json({
       token,
       user: {
@@ -72,7 +75,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-//LOGIN PROCESS---
+//LOGIN PROCESS
 
 
 router.post('/login', async (req, res) => {
@@ -91,7 +94,9 @@ router.post('/login', async (req, res) => {
 
     const user = result.rows[0];
 
-    //return the same error whether the email doesnt exist or the password is wrong — prevents username enumeration attacks where an attacker tests emails to find which ones are registered
+    //username enumeration prevention - both 'email not found' and,
+    //'wrong password' return the same error message and HTTP status code,
+    //this is so attackers can't tell which failed
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
@@ -103,12 +108,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    //sign a new JWT for the user
-    const token = jwt.sign(
-      { userId: user.id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
-    );
+    const token = signToken(user.id, user.role);
 
     return res.status(200).json({
       token,

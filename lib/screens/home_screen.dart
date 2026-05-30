@@ -4,6 +4,8 @@ import 'question_screen.dart';
 import 'login_screen.dart';
 import '../services/authentication_service.dart';
 import '../services/quiz_service.dart';
+import 'questionnaire_review_screen.dart';
+import 'history_screen.dart';
 
 //statefulwidget because the screen now fetches data from the backend
 class HomeScreen extends StatefulWidget {
@@ -83,14 +85,44 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
 
-                  //logout button in the top right corner
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: IconButton(
-                      icon: const Icon(Icons.logout, color: Colors.white),
-                      onPressed: () => _logout(context),
-                      tooltip: 'Logout',
-                    ),
+                  
+                   //top row of icon buttons — review, history and logout
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      //questionnaire review button
+                      IconButton(
+                        icon: const Icon(Icons.assignment, color: Colors.white),
+                        tooltip: 'Your questionnaire',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const QuestionnaireReviewScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      //score history button
+                      IconButton(
+                        icon: const Icon(Icons.bar_chart, color: Colors.white),
+                        tooltip: 'Score history',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HistoryScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      //logout button
+                      IconButton(
+                        icon: const Icon(Icons.logout, color: Colors.white),
+                        tooltip: 'Logout',
+                        onPressed: () => _logout(context),
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 16),

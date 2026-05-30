@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../services/authentication_service.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
+import '../services/questionnaire_service.dart';
+import 'questionnaire_screen.dart';
 
 //statefulwidget because the screen has changing data
 //the text fields, loading state and error message all change as the user interacts
@@ -18,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   final AuthenticationService _authenticationService = AuthenticationService();
+  final QuestionnaireService _questionnaireService = QuestionnaireService();
 
   //tracks whether the login request is in progress so a loading spinner can be shown
   bool _isLoading = false;
@@ -39,15 +42,28 @@ class _LoginScreenState extends State<LoginScreen> {
       _passwordController.text,
     );
 
-    //if error is null the login was successful
+   //if error is null the login was successful
     if (error == null) {
-      //replace the login screen with the home screen
-      //pushReplacement means the user cant press back to return to login
       if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
+        //check if this user has already completed the questionnaire
+        final completed = await _questionnaireService.hasCompleted();
+
+        if (!mounted) return;
+
+        if (completed) {
+          //questionnaire complete? = yes - navigate to HomeScreen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
+        } else {
+          //questionnaire complete? = no - navigate to QuestionnaireScreen
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const QuestionnaireScreen()),
+            (route) => false,
+          );
+        }
       }
     } else {
       //show the error message from the backend

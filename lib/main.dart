@@ -51,25 +51,29 @@ class _AuthenticationGateState extends State<AuthenticationGate> {
     //chcek for a stored toekn as soon as the widget is created 
     _checkLoginStatus();
   }
+
+  Widget _buildLoadingScreen() {
+    return const Scaffold(
+      backgroundColor: Color (0xFF2C2C2C),
+      body: Center(
+        child: CircularProgressIndicator(color: Colors.white),
+      )
+    );
+  }
   
   Future<void> _checkLoginStatus() async {
     final loggedIn = await _authenticationService.isLoggedIn();
     setState(() {
       _isLoggedIn = loggedIn;
+
       _isLoading = false;
     });
   }
   @override
   Widget build(BuildContext context) {
     //show a loading spinner while checking for the token - prevents a flash of the wrong screen on startup
-    if(_isLoading) {
-      return const Scaffold(
-        backgroundColor: Color(0xFF2C2C2C),
-        body: Center(
-          child: CircularProgressIndicator(color: Colors.white),
-        ),
-      );
-    }
+    if(_isLoading) return _buildLoadingScreen();
+
     //show the user the correct screen based on login status
     return _isLoggedIn ? const HomeScreen() : const LoginScreen();
   }

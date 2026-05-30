@@ -16,7 +16,7 @@ class QuestionScreen extends StatefulWidget {
 
 class _QuestionScreenState extends State<QuestionScreen> {
   
-  int _currentIndex = 0;
+  int _questionIndex = 0;
 
   final List<QuestionResult> _results = [];
 
@@ -31,7 +31,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
     super.dispose();
   }
 
-  Question get _currentQuestion => widget.questions[_currentIndex];
+  Question get _currentQuestion => widget.questions[_questionIndex];
 
   //called when the user taps the yes/no button
   Future<void> _submitAnswer(bool userAiAnswer) async {
@@ -59,7 +59,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
       MaterialPageRoute(
         builder: (context) => FeedbackScreen(
           result: _results.last,
-          questionNumber: _currentIndex + 1,
+          questionNumber: _questionIndex + 1,
           totalQuestions: widget.questions.length,
           onNext: _onFeedbackComplete,
         ),
@@ -71,7 +71,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
   void _onFeedbackComplete() {
     Navigator.pop(context);
 
-    final nextIndex = _currentIndex + 1;
+    final nextIndex = _questionIndex + 1;
 
     if (nextIndex >= widget.questions.length) {
       Navigator.pushReplacement(
@@ -81,9 +81,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
         ),
       );
     } else {
-      //setState() updates _currentIndex to the next question and clears the text field - without it the screen wouldn't update visually
+      //setState() updates _questionIndex to the next question and clears the text field - without it the screen wouldn't update visually
       setState(() {
-        _currentIndex = nextIndex;
+        _questionIndex = nextIndex;
         _explanationController.clear();
       });
     }
@@ -92,7 +92,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
   @override
   Widget build(BuildContext context) {
     final question = _currentQuestion;
-    final questionNumber = _currentIndex + 1;
+    final questionNumber = _questionIndex + 1;
     final totalQuestions = widget.questions.length;
 
     return Scaffold(
@@ -100,10 +100,10 @@ class _QuestionScreenState extends State<QuestionScreen> {
         children: [
 
           //background image changes with each question
-          //uses the current index to pick q1.jpg through q10.jpg
+          //uses the question index to pick q1.jpg through q10.jpg
           Positioned.fill(
             child: Image.asset(
-              'assets/images/q${_currentIndex + 1}.jpg',
+              'assets/images/q${_questionIndex + 1}.jpg',
               fit: BoxFit.cover,
             ),
           ),
