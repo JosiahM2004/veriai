@@ -96,7 +96,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         final totalAttempts = row['total_attempts'] as int;
         final correctAnswers = row['correct_answers'] as int;
 
-        //work out the accuracy percentage, guarding against divide by zero
+        
         final accuracy = totalAttempts == 0
             ? 0
             : ((correctAnswers / totalAttempts) * 100).round();

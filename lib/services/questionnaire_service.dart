@@ -3,34 +3,33 @@ import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import 'authentication_service.dart';
 
-// handles all API calls related to the questionnaire feature
+//handles all API calls related to the questionnaire feature
 class QuestionnaireService {
   final AuthenticationService _authService = AuthenticationService();
 
-  // asks the backend whether this user has already submitted the questionnaire
-  // returns true if they have, false if they havent
+  //asks the backend whether this user has already submitted the questionnaire
+  //returns true if they have, false if they havent
   Future<bool> hasCompleted() async {
     try {
-      // get the stored JWT so we can authenticate the request
+      / get the stored JWT so we can authenticate the request
       final token = await _authService.getToken();
 
       final response = await http.get(
         Uri.parse('${ApiConfig.baseUrl}/questionnaire/status'),
         headers: {
           'Content-Type': 'application/json',
-          // the backend middleware reads this header to verify who the user is
+          //the backend middleware reads this header to verify who the user is
           'Authorization': 'Bearer $token',
         },
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        // backend returns { "completed": true } or { "completed": false }
+        //backend returns { "completed": true } or { "completed": false }
         return data['completed'] == true;
       }
 
-      // if the request fails for any reason, assume completed so we never
-      // accidentally show the questionnaire to someone who already did it
+      
       return true;
 
     } catch (e) {
@@ -50,14 +49,13 @@ class QuestionnaireService {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
-        // scores is a map like { 'q1_score': 3, 'q2_score': 2, ... }
-        // jsonEncode turns it into a JSON string for the request body
+        
         body: jsonEncode(scores),
       );
 
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body);
-        // the database calculated total_score and the backend returned it
+        
         return data['total_score'] as int;
       }
 
@@ -68,8 +66,8 @@ class QuestionnaireService {
     }
   }
 
-  // fetches the user's saved questionnaire scores from the backend
-  // returns a map like { 'q1_score': 3, 'q2_score': 2, ... } or null if it fails
+  //fetches the user's saved questionnaire scores from the backend
+  //returns a map like { 'q1_score': 3, 'q2_score': 2, ... } or null if it fails
   Future<Map<String, int>?> getResponses() async {
     try {
       final token = await _authService.getToken();

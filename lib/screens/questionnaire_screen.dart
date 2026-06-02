@@ -102,7 +102,7 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
     if (totalScore != null) {
       _showResultDialog();
     } else {
-      // submission failed — still let the user through rather than blocking them
+      //submission failed — still let the user through 
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -114,7 +114,7 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
   void _showResultDialog() {
     showDialog(
       context: context,
-      // user must tap the button — cant dismiss by tapping outside
+      //user must tap the button 
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: const Text('Thank you!'),
@@ -241,7 +241,7 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                             decoration: BoxDecoration(
-                              // blue when selected, white when not
+                              //blue when selected, white when not
                               color: isSelected
                                   ? const Color(0xFF3A7BD5)
                                   : Colors.white.withOpacity(0.88),
