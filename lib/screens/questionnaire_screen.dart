@@ -14,14 +14,13 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
 
   bool _isLoading = false;
 
-  // tracks which question the user is currently on (0 to 4)
+ 
   int _currentQuestion = 0;
 
-  // one slot per question, null means not yet answered
+ 
   final List<int?> _selectedAnswers = List.filled(5, null);
 
-  // your original microsoft forms questions, reordered as agreed (6, 8, 7, 10, 11)
-  // scores are assigned so that more engaged/aware answers score higher
+
   final List<Map<String, dynamic>> _questions = [
     {
       'question': 'Do you think AI benefits businesses?',
@@ -74,7 +73,7 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
   Future<void> _advance() async {
     if (_selectedAnswers[_currentQuestion] == null) return;
 
-    // more questions to go — just advance the index
+    
     if (_currentQuestion < _questions.length - 1) {
       setState(() {
         _currentQuestion++;
@@ -82,7 +81,7 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
       return;
     }
 
-    // all 5 answered — build the scores map and submit
+    //all 5 answered — build the scores map and submit
     setState(() {
       _isLoading = true;
     });

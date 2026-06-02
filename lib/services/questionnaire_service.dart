@@ -11,7 +11,7 @@ class QuestionnaireService {
   //returns true if they have, false if they havent
   Future<bool> hasCompleted() async {
     try {
-      / get the stored JWT so we can authenticate the request
+      //get the stored JWT so we can authenticate the request
       final token = await _authService.getToken();
 
       final response = await http.get(
