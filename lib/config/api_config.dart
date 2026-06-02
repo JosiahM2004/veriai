@@ -2,7 +2,7 @@
 //changing the server URL here updates it everywhere in the app
 class ApiConfig {
   
-  static const String baseUrl = 'http://172.20.10.6:3000';
+  static const String baseUrl = 'http://129.12.153.135:3000';
 
   //authentication endpoints
   static const String register = '$baseUrl/auth/register';

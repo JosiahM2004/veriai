@@ -181,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       //informal button — left side
                       Expanded(
                         child: _CategoryButton(
-                          label: 'Informal content - containing things like internet videos, text messages and more',
+                          label: 'Informal content',
                           onTap: () => _startQuiz(context, 'informal'),
                         ),
                       ),
@@ -191,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       //formal button — right side
                       Expanded(
                         child: _CategoryButton(
-                          label: 'Formal content - containing things like emails, news segments and educational/ informative books',
+                          label: 'Formal content',
                           onTap: () => _startQuiz(context, 'formal'),
                         ),
                       ),
